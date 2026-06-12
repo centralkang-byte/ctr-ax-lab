@@ -1,0 +1,30 @@
+# Build + test gate. Runs on every push to main and on PRs into main so broken
+# code can't reach Vercel unnoticed — the vitest suites + a green `next build`
+# are this repo's main regression signal ("always keep the build passing").
+#
+# No secrets needed: `next build` is env-free here — the DB/LLM/auth modules all
+# read env defensively (sql is null without a connection string, the Entra
+# provider tolerates undefined ids, keys are read at request time), so the build
+# falls back cleanly when nothing is set. Verified by building with no .env
+# present. The vitest suites are pure. That's why this job sets no env / secrets.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          # Matches the dev machine + Vercel's current Node 24 LTS default.
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build

@@ -1,0 +1,355 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  /* Hairline/Swiss redesign: near-sharp corners. The Tailwind radius scale is
+     collapsed in tailwind.config.ts; this keeps shadcn's --radius in sync. */
+  --radius: 0.125rem;
+  --c-bg: 247 243 235;
+  --c-panel: 255 252 247;
+  --c-panel2: 243 239 232;
+  --c-border: 186 175 154;
+  --c-text: 3 23 39;
+  --c-muted: 92 98 110;
+  --c-primary: 3 23 39;
+  --c-ok: 36 88 70;
+  --c-danger: 127 51 53;
+  --c-accent-1: 35 59 78;
+  --c-accent-2: 77 90 109;
+  --c-accent-3: 226 35 26;
+  --c-info: 14 165 233;
+  --c-success: 16 185 129;
+  --c-warning: 245 158 11;
+  --c-destructive: 225 29 72;
+  --bg-grad-1: radial-gradient(1200px 560px at 0% -10%, rgba(226, 35, 26, 0.10) 0%, transparent 58%);
+  --bg-grad-2: radial-gradient(960px 440px at 100% -20%, rgba(3, 23, 39, 0.08) 0%, transparent 60%);
+}
+
+/* Base size matches the "comfortable" density the app always sets, so the page
+   does NOT jump 14px → 18px after EvalShell hydrates and sets data-density.
+   The density attributes still override for the compact/large options. */
+html {
+  font-size: 18px;
+}
+
+:root[data-density="compact"] {
+  font-size: 14px;
+}
+
+:root[data-density="comfortable"] {
+  font-size: 18px;
+}
+
+:root[data-density="large"] {
+  font-size: 20px;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body), "Inter", "Segoe UI", sans-serif;
+  background:
+    var(--bg-grad-1),
+    var(--bg-grad-2),
+    rgb(var(--c-bg));
+  color: rgb(var(--c-text));
+}
+
+/* Ambient living backdrop — a very slow drift of the radial gradients so the
+   page feels subtly alive without distracting. Disabled under reduced-motion. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -20%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    var(--bg-grad-1),
+    var(--bg-grad-2);
+  animation: ambient-drift 28s ease-in-out infinite alternate;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display), "Manrope", sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Native select popup can ignore utility classes; force option contrast by theme tokens. */
+select,
+option,
+optgroup {
+  color: rgb(var(--c-text));
+  background-color: rgb(var(--c-panel));
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --c-bg: 11 17 22;
+  --c-panel: 18 28 36;
+  --c-panel2: 24 35 44;
+  --c-border: 78 89 100;
+  --c-text: 239 236 228;
+  --c-muted: 170 173 170;
+  --c-primary: 239 236 228;
+  --c-ok: 122 189 155;
+  --c-danger: 232 144 138;
+  --c-accent-1: 114 137 160;
+  --c-accent-2: 138 149 165;
+  --c-accent-3: 240 90 82;
+  --c-info: 56 189 248;
+  --c-success: 52 211 153;
+  --c-warning: 251 191 36;
+  --c-destructive: 251 113 133;
+  --bg-grad-1: radial-gradient(1200px 520px at 15% -10%, rgba(240, 90, 82, 0.10) 0%, transparent 58%);
+  --bg-grad-2: radial-gradient(920px 420px at 100% -15%, rgba(76, 98, 119, 0.22) 0%, transparent 58%);
+}
+
+/* Visible scrollbar for mail body and AI panel */
+.scrollbar-show {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--c-border) / 0.38) transparent;
+}
+.scrollbar-show::-webkit-scrollbar {
+  width: 8px;
+}
+.scrollbar-show::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-show::-webkit-scrollbar-thumb {
+  background: rgb(var(--c-border) / 0.42);
+  border-radius: 999px;
+}
+.scrollbar-show::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--c-muted));
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display), "Manrope", sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  .ghost-border {
+    box-shadow: inset 0 0 0 1px rgb(var(--c-border) / 0.15);
+  }
+
+  .executive-glass {
+    background: rgb(var(--c-panel) / 0.7);
+    backdrop-filter: blur(20px);
+  }
+
+  /* ── Hairline/Swiss vocabulary ─────────────────────────────────────────── */
+
+  /* Small-caps section label — formalizes the inlined uppercase/tracked label
+     pattern used across the workspace, score panel, and dialog. */
+  .eyebrow {
+    font-size: 0.75rem;
+    line-height: 1.2;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: rgb(var(--c-muted));
+  }
+
+  .hairline-t {
+    border-top: 1px solid rgb(var(--c-border) / 0.45);
+  }
+  .hairline-b {
+    border-bottom: 1px solid rgb(var(--c-border) / 0.45);
+  }
+
+  /* ── Motion ────────────────────────────────────────────────────────────── */
+
+  /* Streaming/loading text: a light sweep travels across the glyphs. Pair with
+     `text-transparent bg-clip-text`. */
+  .shimmer-text {
+    background: linear-gradient(
+      100deg,
+      rgb(var(--c-muted)) 30%,
+      rgb(var(--c-text)) 50%,
+      rgb(var(--c-muted)) 70%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 1.6s linear infinite;
+  }
+
+  /* Blinking caret appended to streaming output. */
+  .stream-caret::after {
+    content: "";
+    display: inline-block;
+    width: 0.5ch;
+    height: 1em;
+    margin-left: 1px;
+    vertical-align: -0.12em;
+    background: rgb(var(--c-primary) / 0.8);
+    animation: caret 1s steps(1) infinite;
+  }
+
+  /* Thin animated gradient bar shown under a header while the model works. */
+  .thinking-bar {
+    height: 2px;
+    width: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(var(--c-accent-3)) 35%,
+      rgb(var(--c-primary)) 50%,
+      rgb(var(--c-accent-3)) 65%,
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: thinking 1.4s linear infinite;
+  }
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% center;
+  }
+}
+
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes thinking {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes ambient-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate3d(2%, 1.5%, 0) scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(-1.5%, -1%, 0) scale(1.02);
+    opacity: 0.92;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Respect the OS setting: kill ambient + decorative motion, keep layout intact. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .shimmer-text {
+    color: rgb(var(--c-text));
+  }
+}
+
+/* ── Star-chart — the /evaluate workspace ────────────────────────────────────
+   A navigator's plotting table: faint starfield atmosphere on the frame, a 2D
+   Impact × Feasibility chart, and the proposal plotted as a glowing star. */
+
+.star-frame {
+  position: relative;
+}
+/* Starfield + constellation dust drifting faintly behind the whole frame. */
+.star-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(rgb(var(--c-accent-3) / 0.55) 0.6px, transparent 1.1px),
+    radial-gradient(rgb(var(--c-border) / 0.65) 0.5px, transparent 1px);
+  background-size: 58px 58px, 104px 104px;
+  background-position: 10px 16px, 52px 70px;
+  opacity: 0.4;
+  animation: drift 60s ease-in-out infinite alternate;
+}
+.star-frame > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Type-only downscale (85%) for the evaluate workspace. We override font-size on
+   the Tailwind text-* utilities rather than zooming the container, so spacing and
+   layout stay put — only the type shrinks. Line-heights are left as Tailwind set
+   them. Descendant specificity (0,2,0) beats the single-class utilities. */
+.font-scale-85 .text-xs {
+  font-size: 0.6375rem;
+}
+.font-scale-85 .text-sm {
+  font-size: 0.74375rem;
+}
+.font-scale-85 .text-base {
+  font-size: 0.85rem;
+}
+.font-scale-85 .text-lg {
+  font-size: 0.95625rem;
+}
+
+@layer utilities {
+  /* The proposal's "brightness" — a large display numeral. */
+  .magnitude {
+    font-family: var(--font-display), "Manrope", sans-serif;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.04em;
+    line-height: 0.85;
+  }
+  /* Coordinate readout for Impact / Feasibility. */
+  .coord {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+  }
+  /* The chart's integer gridlines (axis 1–5 → four cells). */
+  .chart-grid {
+    background-image:
+      linear-gradient(rgb(var(--c-border) / 0.22) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--c-border) / 0.22) 1px, transparent 1px);
+    background-size: 25% 25%;
+  }
+  .nstar-twinkle {
+    animation: nstar-twinkle 3.4s ease-in-out infinite;
+  }
+}
+
+@keyframes nstar-twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.66;
+  }
+}
+@keyframes drift {
+  to {
+    background-position: 34px 40px, 84px 26px;
+  }
+}

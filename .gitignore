@@ -1,0 +1,33 @@
+# dependencies
+/node_modules
+
+# next.js build output
+/.next
+/out
+
+# local env files
+.env*.local
+
+# misc
+.DS_Store
+*.tsbuildinfo
+
+# heavy local data (audio uploads)
+/data/uploads
+
+# Real runtime DB / synced content (PII + secrets) — keep only minimal seed
+/data/db
+/data/db.json
+/data/d365
+/data/objective-feedback-history
+/data/kr-feedback-history
+
+# shared evaluation log + admin settings + progress feed (runtime data).
+# The whole data/ store is regenerated at runtime (JSON fallback for local
+# dev) and must never reach git — it holds admin emails, review text, and
+# progress notes. Catch-all so new runtime files (progress-*.json) are covered.
+/data/*.json
+.vercel
+
+# Local Claude Code worktrees
+.claude/worktrees/
